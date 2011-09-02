@@ -18,9 +18,8 @@ prodCoffeeOpts = "--bare --output #{prodTargetJsDir} --compile #{prodTargetCoffe
 testCoffeeOpts = "--output #{testTargetJsDir}"
 
 prodCoffeeFiles = [
-    'intro'
-    'core'
-    'outro'
+    'node.js'
+    'heap.js'
 ]
 
 task 'watch:all', 'Watch production and test CoffeeScript', ->
