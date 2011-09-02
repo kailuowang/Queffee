@@ -1,6 +1,6 @@
 # quefee
 
-*A [CoffeeScript](http://jashkenas.github.com/coffee-script/ "CoffeeScript") dynamic priority work queue library. (used skeleton project [InstantJasmineCoffee](https://github.com/krismolendyke/InstantJasmineCoffee "InstantJasmineCoffee") )*
+*A [CoffeeScript](http://jashkenas.github.com/coffee-script/ "CoffeeScript") dynamic priority work queue library.*
 
 ## Requirements
 Based on the change to module management in [`npm` v1.0+](http://blog.nodejs.org/2011/03/23/npm-1-0-global-vs-local-installation/ "npm 1.0: Global vs Local installation &laquo; node blog"), the following modules are now local to this project:
@@ -22,6 +22,9 @@ From project root:
 ## To build min js
 
     cake build
+
+## Acknowledgment
+* used skeleton project [InstantJasmineCoffee](https://github.com/krismolendyke/InstantJasmineCoffee "InstantJasmineCoffee")
 
 ## License
 
