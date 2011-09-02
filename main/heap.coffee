@@ -19,3 +19,5 @@ class Heap
     this._last().siftUp()
 
   _last: => new Node(@array, @array.size - 1, @comp)
+
+this.Heap = Heap

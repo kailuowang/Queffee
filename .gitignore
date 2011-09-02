@@ -3,3 +3,4 @@ test/src/js
 .idea
 node_modules/uglify-js/tmp
 *.swp
+output

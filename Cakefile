@@ -3,42 +3,27 @@ fs     = require 'fs'
 util   = require 'util'
 uglify = require './node_modules/uglify-js'
 
-prodSrcCoffeeDir     = 'production/src/coffee-script'
-testSrcCoffeeDir     = 'test/src/coffee-script'
+srcCoffeeDir     = 'main'
+testSrcCoffeeDir     = 'test'
 
-prodTargetJsDir      = 'production/src/js'
-testTargetJsDir      = 'test/src/js'
+prodTargetJsDir      = 'output/production'
+testTargetJsDir      = 'output/test'
+devTargetJsDir       = 'output/development'
 
-prodTargetFileName   = 'app'
-prodTargetCoffeeFile = "#{prodSrcCoffeeDir}/#{prodTargetFileName}.coffee"
+prodTargetFileName   = 'queffee'
+prodTargetCoffeeFile = "#{srcCoffeeDir}/#{prodTargetFileName}.coffee"
 prodTargetJsFile     = "#{prodTargetJsDir}/#{prodTargetFileName}.js"
 prodTargetJsMinFile  = "#{prodTargetJsDir}/#{prodTargetFileName}.min.js"
 
 prodCoffeeOpts = "--bare --output #{prodTargetJsDir} --compile #{prodTargetCoffeeFile}"
 testCoffeeOpts = "--output #{testTargetJsDir}"
+devCoffeeOpts = "--output #{devTargetJsDir}"
 
 prodCoffeeFiles = [
-    'node.js'
-    'heap.js'
+    'intro'
+    'node'
+    'heap'
 ]
-
-task 'watch:all', 'Watch production and test CoffeeScript', ->
-    invoke 'watch:test'
-    invoke 'watch'
-    
-task 'build:all', 'Build production and test CoffeeScript', ->
-    invoke 'build:test'
-    invoke 'build'    
-
-task 'watch', 'Watch prod source files and build changes', ->
-    invoke 'build'
-    util.log "Watching for changes in #{prodSrcCoffeeDir}"
-
-    for file in prodCoffeeFiles then do (file) ->
-        fs.watchFile "#{prodSrcCoffeeDir}/#{file}.coffee", (curr, prev) ->
-            if +curr.mtime isnt +prev.mtime
-                util.log "Saw change in #{prodSrcCoffeeDir}/#{file}.coffee"
-                invoke 'build'
 
 task 'build', 'Build a single JavaScript file from prod files', ->
     util.log "Building #{prodTargetJsFile}"
@@ -46,7 +31,7 @@ task 'build', 'Build a single JavaScript file from prod files', ->
     util.log "Appending #{prodCoffeeFiles.length} files to #{prodTargetCoffeeFile}"
     
     for file, index in prodCoffeeFiles then do (file, index) ->
-        fs.readFile "#{prodSrcCoffeeDir}/#{file}.coffee"
+        fs.readFile "#{srcCoffeeDir}/#{file}.coffee"
                   , 'utf8'
                   , (err, fileContents) ->
             handleError(err) if err
@@ -70,23 +55,20 @@ task 'build', 'Build a single JavaScript file from prod files', ->
                 fs.unlink prodTargetCoffeeFile, (err) -> handleError(err) if err
                 invoke 'uglify'                
 
+task 'watch:development', 'Watch production code and build changes', ->
+    invoke 'build:development'
+    invoke 'watch:test'
+    watch srcCoffeeDir,devCoffeeOpts
+
+task 'build:development', 'Build individual development files', ->
+    build srcCoffeeDir, devCoffeeOpts
+
 task 'watch:test', 'Watch test specs and build changes', ->
     invoke 'build:test'
-    util.log "Watching for changes in #{testSrcCoffeeDir}"
-    
-    fs.readdir testSrcCoffeeDir, (err, files) ->
-        handleError(err) if err
-        for file in files then do (file) ->
-            fs.watchFile "#{testSrcCoffeeDir}/#{file}", (curr, prev) ->
-                if +curr.mtime isnt +prev.mtime
-                    coffee testCoffeeOpts, "#{testSrcCoffeeDir}/#{file}"
+    watch testSrcCoffeeDir, testCoffeeOpts
 
 task 'build:test', 'Build individual test specs', ->
-    util.log 'Building test specs'
-    fs.readdir testSrcCoffeeDir, (err, files) ->
-        handleError(err) if err
-        for file in files then do (file) -> 
-            coffee testCoffeeOpts, "#{testSrcCoffeeDir}/#{file}"
+    build testSrcCoffeeDir, testCoffeeOpts
 
 task 'uglify', 'Minify and obfuscate', ->
     jsp = uglify.parser
@@ -121,3 +103,20 @@ displayNotification = (message = '') ->
         image: 'lib/CoffeeScript.png'
     }
     try require('./node_modules/growl').notify message, options
+
+build = (srcDir, opts) ->
+  util.log "Building src in #{srcDir}"
+  fs.readdir srcDir, (err, files) ->
+    handleError(err) if err
+    for file in files then do (file) ->
+      coffee opts, "#{srcDir}/#{file}"
+
+watch = (srcDir, opts) ->
+  util.log "Watching for changes in #{srcDir}"
+
+  fs.readdir srcDir, (err, files) ->
+    handleError(err) if err
+    for file in files then do (file) ->
+      fs.watchFile "#{srcDir}/#{file}", (curr, prev) ->
+        if +curr.mtime isnt +prev.mtime
+          coffee opts, "#{srcDir}/#{file}"

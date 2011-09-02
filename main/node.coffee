@@ -8,10 +8,10 @@ class Node
       @array[@index]
 
   left: =>
-    @_left ?= this._child(2 * @index + 1)
+    @_left ?= this.child_(2 * @index + 1)
 
   right: =>
-    @_right ?=  this._child(2 * @index + 2)
+    @_right ?=  this.child_(2 * @index + 2)
 
   parent: =>
     @_parent ?= new Node(@array, @index / 2, @comp)
@@ -33,7 +33,7 @@ class Node
         this._swap this.parent()
         this.parent().siftUp()
 
-  _child: (childIndex) =>
+  child_: (childIndex) =>
     if (childIndex < @array.length) then new Node(@array, childIndex, @comp) else null
 
   _findSmallerChildren: =>
@@ -51,3 +51,5 @@ class Node
 
   _comp: (na, nb) =>
     @comp(na.value(), nb.value())
+
+this.Node = Node
