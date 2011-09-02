@@ -1,7 +1,6 @@
 class Node
   constructor: (@array, @index, @comp = (a,b) -> a > b ) ->
 
-
   value: (newVal) =>
     if newVal?
       @array[@index] = newVal
