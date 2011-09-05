@@ -10,7 +10,7 @@ prodTargetJsDir      = 'output/production'
 testTargetJsDir      = 'output/test'
 devTargetJsDir       = 'output/development'
 
-prodTargetFileName   = 'queffee'
+prodTargetFileName   = 'quefee'
 prodTargetCoffeeFile = "#{srcCoffeeDir}/#{prodTargetFileName}.coffee"
 prodTargetJsFile     = "#{prodTargetJsDir}/#{prodTargetFileName}.js"
 prodTargetJsMinFile  = "#{prodTargetJsDir}/#{prodTargetFileName}.min.js"
@@ -24,6 +24,9 @@ prodCoffeeFiles = [
     'quefee'
     'node'
     'heap'
+    'job'
+    'q'
+    'worker'
 ]
 
 task 'build', 'Build a single JavaScript file from prod files', ->

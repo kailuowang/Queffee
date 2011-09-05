@@ -15,7 +15,7 @@ class quefee.Node
     @_right ?=  this.child_(2 * @index + 2)
 
   parent: =>
-    @_parent ?= new Node(@array, @index / 2, @comp)
+    @_parent ?= new Node(@array, Math.floor(@index / 2), @comp)
 
   heapify: =>
     if this.left()? then this.left().heapify()
@@ -30,7 +30,7 @@ class quefee.Node
 
   siftUp: =>
     unless this._isRoot()
-      if this.parent().value() > this.value()
+      if this._comp(this, this.parent())
         this._swap this.parent()
         this.parent().siftUp()
 

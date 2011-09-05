@@ -10,3 +10,8 @@ describe 'Node', ->
     it "returns nothing if the node is invalid", ->
       node = new quefee.Node([5], 1)
       expect(node.value()?).toBeFalsy()
+
+  describe "#parent", ->
+    it "returns the parent of the node", ->
+      node = new quefee.Node([5,3], 1)
+      expect(node.parent().value()).toEqual(5)

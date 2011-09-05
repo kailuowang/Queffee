@@ -3,6 +3,9 @@ describe "Heap", ->
     it "should create from array", ->
       expect(new quefee.Heap([4,5]).size()).toEqual(2)
 
+    it "creates empty when no array passed in", ->
+      expect(new quefee.Heap().size()).toEqual(0)
+
   describe "#top", ->
     it "should return the top item in the binaryHeap", ->
       expect(new quefee.Heap([7, 6, 4, 3, 5, 10]).top()).toEqual(10)
@@ -52,6 +55,15 @@ describe "Heap", ->
       heap.extractTop()
       heap.insert(1)
       expect(heap.top()).toEqual(1)
+
+    it 'inserts values in sequence into empty heap', ->
+      heap = new quefee.Heap()
+      heap.insert(4)
+      heap.insert(5)
+      heap.insert(3)
+      expect(heap.extractTop()).toEqual(5)
+      expect(heap.extractTop()).toEqual(4)
+      expect(heap.extractTop()).toEqual(3)
 
   describe "#reorder", ->
     it "should reorder the heap", ->
