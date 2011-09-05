@@ -1,4 +1,4 @@
-class Node
+class quefee.Node
   constructor: (@array, @index, @comp = (a,b) -> a > b ) ->
 
   value: (newVal) =>
@@ -51,5 +51,3 @@ class Node
 
   _comp: (na, nb) =>
     @comp(na.value(), nb.value())
-
-this.Node = Node

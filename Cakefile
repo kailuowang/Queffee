@@ -21,6 +21,7 @@ devCoffeeOpts = "--output #{devTargetJsDir}"
 
 prodCoffeeFiles = [
     'intro'
+    'quefee'
     'node'
     'heap'
 ]

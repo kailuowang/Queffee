@@ -1,6 +1,6 @@
-class Heap
+class quefee.Heap
   constructor: (@array, @comp = (a, b) -> a > b) ->
-    @_root = new Node(@array, 0, @comp)
+    @_root = new quefee.Node(@array, 0, @comp)
     @_root.heapify()
 
   size: =>
@@ -18,6 +18,4 @@ class Heap
     @array.push(newItem)
     this._last().siftUp()
 
-  _last: => new Node(@array, @array.size - 1, @comp)
-
-this.Heap = Heap
+  _last: => new quefee.Node(@array, @array.size - 1, @comp)
