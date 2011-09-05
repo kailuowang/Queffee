@@ -26,11 +26,11 @@ From project root:
 ## Usage
 Suppose you have two asyn functions: doSomething and doSomethingHigher, both take in callback function that they will call once they are done.
 
-  q = new quefee.Q
-  q.enQ (callback) -> doSomething(onSuccess: callback), 1
-  q.enQ (callback) -> doSomethingHigher(onSuccess: callback), () -> 2
+    q = new quefee.Q
+    q.enQ (callback) -> doSomething(onSuccess: callback), 1
+    q.enQ (callback) -> doSomethingHigher(onSuccess: callback), () -> 2
 
-  new quefee.Worker(q).start() #you can have multiple workers.
+    new quefee.Worker(q).start() #you can have multiple workers.
 
 The doSomethingHigher will be performed first, and then doSomething. Notice that the second parameter of enQ is the priority, it can be a function or a value.
 If your works priority is dynamic using the priority function, you can call q.reorder() to re-prioritize you queue whenever you deem appropriate.
@@ -39,20 +39,20 @@ Another tool is collectionWorkQ which helps you run asynchronized operations on 
 won't start the next one until the first one called the success callback)
 example:
 
-  new quefee.CollectionWorkQ(
-    collection: [item1, item2]
-    operation: 'someOperation'
-    onProgress: -> count++
-    onFinish: -> alert('finished')
-  ).start()
+    new quefee.CollectionWorkQ(
+      collection: [item1, item2]
+      operation: 'someOperation'
+      onProgress: -> count++
+      onFinish: -> alert('finished')
+    ).start()
 
 or
- new quefee.CollectionWorkQ(
-    collection: [item1, item2]
-    operation: (item, callback) -> item.someOperation(callback)
-    onProgress: -> count++
-    onFinish: -> alert('finished')
-  ).start()
+    new quefee.CollectionWorkQ(
+      collection: [item1, item2]
+      operation: (item, callback) -> item.someOperation(callback)
+      onProgress: -> count++
+      onFinish: -> alert('finished')
+    ).start()
 
 ## Acknowledgment
 * used skeleton project [InstantJasmineCoffee](https://github.com/krismolendyke/InstantJasmineCoffee "InstantJasmineCoffee")
