@@ -20,10 +20,50 @@ describe "Heap", ->
       expect(heap.extractTop()).toEqual(5)
       expect(heap.extractTop()).toEqual(6)
 
+    it "retains rest of the items", ->
+      heap = new quefee.Heap([6, 9, 5])
+      expect(heap.extractTop()).toEqual(9)
+      expect(heap.extractTop()).toEqual(6)
+      expect(heap.extractTop()).toEqual(5)
+
+    it "returns nothing if already empty", ->
+      heap = new quefee.Heap([6, 9])
+      heap.extractTop()
+      heap.extractTop()
+      expect(heap.extractTop()?).toBeFalsy()
+
   describe "#insert", ->
     it "should insert value into heap", ->
       heap = new quefee.Heap([6, 7, 2, 10, 3])
       heap.insert(8)
       expect(heap.extractTop()).toEqual(10)
       expect(heap.extractTop()).toEqual(8)
+
+    it "add a new value to the heap", ->
+      heap = new quefee.Heap([9,10])
+      heap.insert(8)
+      expect(heap.extractTop()).toEqual(10)
+      expect(heap.extractTop()).toEqual(9)
+      expect(heap.extractTop()).toEqual(8)
+
+    it "insert new values if already empty", ->
+      heap = new quefee.Heap([9,10])
+      heap.extractTop()
+      heap.extractTop()
+      heap.insert(1)
+      expect(heap.top()).toEqual(1)
+
+  describe "#reorder", ->
+    it "should reorder the heap", ->
+      a = {p: 1}
+      b = {p: 2}
+      c = {p: 3}
+      d = {p: 4}
+      heap = new quefee.Heap([a, b, c, d], (x,y) -> x.p > y.p )
+      expect(heap.top()).toEqual(d)
+      d.p = 2
+      b.p = 4
+      heap.reorder()
+      expect(heap.extractTop()).toEqual(b)
+      expect(heap.extractTop()).toEqual(c)
 

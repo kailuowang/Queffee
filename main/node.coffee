@@ -1,8 +1,9 @@
+#internal class used in heap
 class quefee.Node
   constructor: (@array, @index, @comp = (a,b) -> a > b ) ->
 
   value: (newVal) =>
-    if newVal?
+    if newVal? and this._valid()
       @array[@index] = newVal
     else
       @array[@index]
@@ -51,3 +52,6 @@ class quefee.Node
 
   _comp: (na, nb) =>
     @comp(na.value(), nb.value())
+
+  _valid: =>
+    @index < @array.length

@@ -1,21 +1,29 @@
 class quefee.Heap
-  constructor: (@array, @comp = (a, b) -> a > b) ->
-    @_root = new quefee.Node(@array, 0, @comp)
-    @_root.heapify()
+  constructor: (@_array, @comp = (a, b) -> a > b) ->
+    this._init()
+    this.reorder()
 
   size: =>
-    @array.length
+    @_array.length
 
   top: => @_root.value()
 
   extractTop: =>
     retVal = this.top()
-    @_root.value(@array.pop())
+    newRootVal = @_array.pop()
+    this._init()
+    @_root.value(newRootVal)
     @_root.siftDown()
     retVal
 
   insert: (newItem) =>
-    @array.push(newItem)
+    @_array.push(newItem)
     this._last().siftUp()
 
-  _last: => new quefee.Node(@array, @array.size - 1, @comp)
+  reorder: =>
+    @_root.heapify()
+
+  _last: => new quefee.Node(@_array, @_array.size - 1, @comp)
+
+  _init: =>
+    @_root = new quefee.Node(@_array, 0, @comp)
