@@ -23,6 +23,11 @@ describe 'Worker', ->
       new quefee.Worker(q).start()
       expect(job2.perform).toHaveBeenCalled()
 
+    it 'calls onIdle once all jobs are done', ->
+      done = false
+      q = new quefee.Q([nullJob(1)])
+      new quefee.Worker(q, (-> done = true)).start()
+      expect(done).toBeTruthy()
 
     describe "#picking up newly inserted jobs", ->
       it 'automatically picks up the newly added job when idle', ->
@@ -47,5 +52,7 @@ describe 'Worker', ->
         expect(job2.perform).not.toHaveBeenCalled()
         job1.done()
         expect(job2.perform).toHaveBeenCalled()
+
+
 
 

@@ -1,5 +1,5 @@
 class quefee.Worker
-  constructor: (@q) ->
+  constructor: (@q, @onIdle) ->
     @idle_ = true
     @q.onNewJobAdded = =>
       this._work() if @idle_
@@ -14,4 +14,5 @@ class quefee.Worker
       job.perform(this._work)
     else
       @idle_ = true
+      @onIdle?()
 
