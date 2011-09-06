@@ -19,15 +19,14 @@ class quefee.CollectionWorkQ
     jobFn =
       if(typeof @operation is 'string')
         (callback) =>
-          item[@operation] =>
-            @onProgress?()
-            callback()
+          item[@operation](=> this._itemDone(index, callback))
       else
         (callback) =>
-          @operation item, =>
-            @onProgress?()
-            callback()
+          @operation(item, => this._itemDone(index, callback))
 
     new quefee.Job( jobFn , -index)
 
+  _itemDone:(index, callback) =>
+    @onProgress?(index + 1)
+    callback()
 

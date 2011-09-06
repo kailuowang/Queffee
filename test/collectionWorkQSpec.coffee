@@ -25,7 +25,7 @@ describe 'CollectionWorkQ', ->
       new quefee.CollectionWorkQ(
         collection: [item1, item2]
         operation: 'someOperation'
-        onProgress: -> progress++
+        onProgress: (prog) -> progress = prog
       ).start()
       expect(progress).toEqual(0)
       item1.reportSuccess()
