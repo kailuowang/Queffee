@@ -3,7 +3,7 @@ class quefee.Q
     jobA.priority() > jobB.priority()
 
   constructor: (jobs = [])->
-    @_heap = new quefee.Heap(jobs, quefee.Q._compareJob)
+    this._initHeap(jobs)
     @onNewJobAdded = null
 
   enqueue: (jobs...) =>
@@ -12,9 +12,16 @@ class quefee.Q
     @onNewJobAdded?()
 
   enQ: (performFn, priorityFn) =>
-    enqueue(new quefee.Job(performFn, priorityFn))
+    this.enqueue(new quefee.Job(performFn, priorityFn))
 
   dequeue: =>
     @_heap.extractTop()
 
   reorder: => @_heap.reorder()
+
+  size: => @_heap.size()
+
+  clear: => @_heap = this._initHeap([])
+
+  _initHeap: (jobs) =>
+    @_heap = new quefee.Heap(jobs, quefee.Q._compareJob)

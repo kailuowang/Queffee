@@ -23,3 +23,12 @@ describe 'Q', ->
       expect(q.dequeue()).toEqual(highP)
       expect(q.dequeue()).toEqual(mediumP)
       expect(q.dequeue()).toEqual(lowP)
+
+  describe 'clear', ->
+    it 'clears the queue', ->
+      q = new quefee.Q
+      q.enQ(null, -> 3)
+      q.enQ(null, -> 4)
+      q.clear()
+      expect(q.size()).toEqual(0)
+      expect(q.dequeue()?).toBeFalsy()
