@@ -53,6 +53,27 @@ describe 'Worker', ->
         job1.done()
         expect(job2.perform).toHaveBeenCalled()
 
+    describe "when timeout set on job", ->
+      it "picks up the next job after timeout even when callback never happend", ->
+        runs ->
+          job1 = new quefee.Job( (->), 1, 100 )
+          @job2 = nullJob()
+          spyOn(@job2, 'perform')
+          new quefee.Worker(new quefee.Q([job1, @job2])).start()
 
+        waits(200)
+        runs ->
+          expect(@job2.perform).toHaveBeenCalled()
+
+
+      it "went back to idle if the last job timed out", ->
+        runs ->
+          job1 = new quefee.Job( (->), 1, 100 )
+          @worker = new quefee.Worker(new quefee.Q([job1]))
+          @worker.start()
+
+        waits(200)
+        runs ->
+          expect(@worker.idle()).toBeTruthy()
 
 

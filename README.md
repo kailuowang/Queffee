@@ -29,8 +29,14 @@ Suppose you have two asyn functions: doSomething and doSomethingHigher, both tak
     q = new quefee.Q
     q.enQ (callback) -> doSomething(onSuccess: callback), 1
     q.enQ (callback) -> doSomethingHigher(onSuccess: callback), () -> 2
+    q.enQ (callback) -> doSomethingThatMightTimeout(onSuccess: callback), 0, 2000) #timeout the job in 2 secs
 
     new quefee.Worker(q).start() #you can have multiple workers.
+
+    #you can also create an array of quefee.Job (constructor using the same signature as enQ) and create the q using the array
+    job1 = new quefee.Job( (callback) -> doSomething1(callback), 1)
+    job2 = new quefee.Job( (callback) -> doSomething2(callback), 0, 2000)
+    q = new quefee.Q([job1, job2])
 
 The doSomethingHigher will be performed first, and then doSomething. Notice that the second parameter of enQ is the priority, it can be a function or a value.
 If your works priority is dynamic using the priority function, you can call q.reorder() to re-prioritize you queue whenever you deem appropriate.

@@ -11,8 +11,8 @@ class quefee.Q
       @_heap.insert(job)
     @onNewJobAdded?()
 
-  enQ: (performFn, priorityFn) =>
-    this.enqueue(new quefee.Job(performFn, priorityFn))
+  enQ: (performFn, priorityFn, timeout) =>
+    this.enqueue(new quefee.Job(performFn, priorityFn, timeout))
 
   dequeue: =>
     @_heap.extractTop()

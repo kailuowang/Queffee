@@ -7,12 +7,16 @@ class quefee.Worker
   start: =>
     this._work()
 
+  idle: => @idle_
+
   _work: =>
     job = @q.dequeue()
-    if job?
-      @idle_ = false
-      job.perform(this._work)
-    else
-      @idle_ = true
+    if @idle_ = !job?
       @onIdle?()
+    else
+      job.perform(this._work)
+      this._prepareForTimeout(job)
 
+  _prepareForTimeout: (job) =>
+    if job.timeout?()?
+      setTimeout(this._work, job.timeout())
