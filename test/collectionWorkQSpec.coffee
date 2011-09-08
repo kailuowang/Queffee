@@ -3,7 +3,7 @@ describe 'CollectionWorkQ', ->
   describe 'start', ->
     it 'runs operation on items one at a time', ->
       [item1, item2, item3] = [new MockItem(), new MockItem(), new MockItem()]
-      new quefee.CollectionWorkQ(
+      new queffee.CollectionWorkQ(
         collection: [item1, item2, item3]
         operation: 'someOperation'
       ).start()
@@ -22,7 +22,7 @@ describe 'CollectionWorkQ', ->
     it 'reports progress', ->
       progress = 0
       [item1, item2] = [new MockItem(), new MockItem()]
-      new quefee.CollectionWorkQ(
+      new queffee.CollectionWorkQ(
         collection: [item1, item2]
         operation: 'someOperation'
         onProgress: (prog) -> progress = prog
@@ -36,7 +36,7 @@ describe 'CollectionWorkQ', ->
 
     it 'reports finish', ->
       finished = false
-      new quefee.CollectionWorkQ(
+      new queffee.CollectionWorkQ(
         collection: [item1 = new MockItem()]
         operation: 'someOperation'
         onFinish: -> finished = true
@@ -47,7 +47,7 @@ describe 'CollectionWorkQ', ->
 
 
     it 'takes in function that takes an item and callback as the operation', ->
-      new quefee.CollectionWorkQ(
+      new queffee.CollectionWorkQ(
         collection: [item1 = new MockItem(), item2 = new MockItem()]
         operation: (item, callback) -> item.someOperation(callback)
       ).start()

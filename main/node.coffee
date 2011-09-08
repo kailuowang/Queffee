@@ -1,5 +1,5 @@
 #internal class used in heap
-class quefee.Node
+class queffee.Node
   constructor: (@array, @index, @comp = (a,b) -> a > b ) ->
 
   value: (newVal) =>

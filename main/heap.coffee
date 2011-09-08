@@ -1,4 +1,4 @@
-class quefee.Heap
+class queffee.Heap
   constructor: (@_array = [], @comp = (a, b) -> a > b) ->
     this._init()
     this.reorder()
@@ -23,7 +23,7 @@ class quefee.Heap
   reorder: =>
     @_root.heapify()
 
-  _last: => new quefee.Node(@_array, @_array.length - 1, @comp)
+  _last: => new queffee.Node(@_array, @_array.length - 1, @comp)
 
   _init: =>
-    @_root = new quefee.Node(@_array, 0, @comp)
+    @_root = new queffee.Node(@_array, 0, @comp)

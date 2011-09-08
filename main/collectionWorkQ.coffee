@@ -1,4 +1,4 @@
-class quefee.CollectionWorkQ
+class queffee.CollectionWorkQ
   constructor: (opts) ->
     {
       collection: @collection
@@ -8,8 +8,8 @@ class quefee.CollectionWorkQ
     } = opts
 
   start: =>
-    q = new quefee.Q(this._createJobs())
-    new quefee.Worker(q, @onFinish).start()
+    q = new queffee.Q(this._createJobs())
+    new queffee.Worker(q, @onFinish).start()
 
   _createJobs: =>
     for item, index in @collection
@@ -24,7 +24,7 @@ class quefee.CollectionWorkQ
         (callback) =>
           @operation(item, => this._itemDone(index, callback))
 
-    new quefee.Job( jobFn , -index)
+    new queffee.Job( jobFn , -index)
 
   _itemDone:(index, callback) =>
     @onProgress?(index + 1)

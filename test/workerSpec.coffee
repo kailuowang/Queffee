@@ -10,8 +10,8 @@ describe 'Worker', ->
     it 'performs the first job', ->
       job = nullJob()
       spyOn(job, 'perform')
-      q = new quefee.Q([job])
-      new quefee.Worker(q).start()
+      q = new queffee.Q([job])
+      new queffee.Worker(q).start()
       expect(job.perform).toHaveBeenCalled()
 
     it 'goes to the next job when the current job is done', ->
@@ -19,14 +19,14 @@ describe 'Worker', ->
       job2 = nullJob(1)
       spyOn(job2, 'perform')
 
-      q = new quefee.Q([job1, job2])
-      new quefee.Worker(q).start()
+      q = new queffee.Q([job1, job2])
+      new queffee.Worker(q).start()
       expect(job2.perform).toHaveBeenCalled()
 
     it 'calls onIdle once all jobs are done', ->
       done = false
-      q = new quefee.Q([nullJob(1)])
-      new quefee.Worker(q, (-> done = true)).start()
+      q = new queffee.Q([nullJob(1)])
+      new queffee.Worker(q, (-> done = true)).start()
       expect(done).toBeTruthy()
 
     describe "#picking up newly inserted jobs", ->
@@ -34,8 +34,8 @@ describe 'Worker', ->
         job1 = nullJob(2)
         job2 = nullJob(1)
         spyOn(job2, 'perform')
-        q = new quefee.Q([job1])
-        new quefee.Worker(q).start()
+        q = new queffee.Q([job1])
+        new queffee.Worker(q).start()
         q.enqueue(job2)
         expect(job2.perform).toHaveBeenCalled()
 
@@ -46,8 +46,8 @@ describe 'Worker', ->
           }
         job2 = nullJob()
         spyOn(job2, 'perform')
-        q = new quefee.Q([job1])
-        new quefee.Worker(q).start()
+        q = new queffee.Q([job1])
+        new queffee.Worker(q).start()
         q.enqueue(job2)
         expect(job2.perform).not.toHaveBeenCalled()
         job1.done()
@@ -56,10 +56,10 @@ describe 'Worker', ->
     describe "when timeout set on job", ->
       it "picks up the next job after timeout even when callback never happend", ->
         runs ->
-          job1 = new quefee.Job( (->), 1, 100 )
+          job1 = new queffee.Job( (->), 1, 100 )
           @job2 = nullJob()
           spyOn(@job2, 'perform')
-          new quefee.Worker(new quefee.Q([job1, @job2])).start()
+          new queffee.Worker(new queffee.Q([job1, @job2])).start()
 
         waits(200)
         runs ->
@@ -68,8 +68,8 @@ describe 'Worker', ->
 
       it "went back to idle if the last job timed out", ->
         runs ->
-          job1 = new quefee.Job( (->), 1, 100 )
-          @worker = new quefee.Worker(new quefee.Q([job1]))
+          job1 = new queffee.Job( (->), 1, 100 )
+          @worker = new queffee.Worker(new queffee.Q([job1]))
           @worker.start()
 
         waits(200)

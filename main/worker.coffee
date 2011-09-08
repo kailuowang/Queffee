@@ -1,4 +1,4 @@
-class quefee.Worker
+class queffee.Worker
   constructor: (@q, @onIdle) ->
     @idle_ = true
     @q.onNewJobAdded = =>
