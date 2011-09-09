@@ -2,9 +2,9 @@ describe 'Q', ->
   describe 'enqueue/dequeue', ->
     it 'returns the jobs in the order of priority', ->
       q = new queffee.Q
-      lowP = new queffee.Job(null, 3)
-      mediumP = new queffee.Job(null, 4)
-      highP = new queffee.Job(null, 5)
+      lowP = new queffee.Job(null, -1)
+      mediumP = new queffee.Job(null, 0)
+      highP = new queffee.Job(null, 3)
       q.enqueue(mediumP, highP, lowP)
       expect(q.dequeue()).toEqual(highP)
       expect(q.dequeue()).toEqual(mediumP)

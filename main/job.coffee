@@ -3,10 +3,10 @@ class queffee.Job
   constructor: (@_perform, @_priority, @_timeout) ->
 
   priority: =>
-    @_priority?() || @_priority
+    this._try(@_priority)
 
   timeout: =>
-    @_timeout?() || @_timeout
+    this._try(@_timeout)
 
   perform: (callback)=>
     @running = true
@@ -19,3 +19,9 @@ class queffee.Job
     if @running
       @running = false
       @_onJobDone()
+
+  _try: (func_or_val) =>
+    if (typeof func_or_val is 'function')
+      func_or_val?()
+    else
+      func_or_val
