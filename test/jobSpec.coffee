@@ -15,3 +15,21 @@ describe 'Job', ->
 
     it 'returns undefined if not set', ->
       expect(new queffee.Job(null, 1).timeout()).toBeUndefined()
+
+    it "calls the call back after the timeout", ->
+      runs ->
+        @calledback = false
+        job = new queffee.Job((->), 1, 100)
+        job.perform( => @calledback = true)
+      waits(200)
+      runs ->
+        expect(@calledback).toBeTruthy()
+
+    it "does not call the callback more than once", ->
+      runs ->
+        @calledback = 0
+        job = new queffee.Job(((callback)-> callback()), 1, 100)
+        job.perform( => @calledback++)
+      waits(200)
+      runs ->
+        expect(@calledback).toEqual(1)

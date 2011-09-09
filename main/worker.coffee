@@ -2,7 +2,7 @@ class queffee.Worker
   constructor: (@q, @onIdle) ->
     @idle_ = true
     @q.onNewJobAdded = =>
-      this._work() if @idle_
+      this._work()
 
   start: =>
     this._work()
@@ -10,13 +10,13 @@ class queffee.Worker
   idle: => @idle_
 
   _work: =>
-    job = @q.dequeue()
-    if @idle_ = !job?
-      @onIdle?()
-    else
-      job.perform(this._work)
-      this._prepareForTimeout(job)
+    if @idle_
+      job = @q.dequeue()
+      if @idle_ = !job?
+        @onIdle?()
+      else
+        job.perform this._onJobDone
 
-  _prepareForTimeout: (job) =>
-    if job.timeout?()?
-      setTimeout(this._work, job.timeout())
+  _onJobDone: =>
+    @idle_ = true
+    this._work()

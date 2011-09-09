@@ -2,10 +2,7 @@ describe 'Worker', ->
   describe '#start', ->
 
     nullJob = (priority_ = 1) ->
-      {
-        perform: (callback) -> callback()
-        priority: -> priority_
-      }
+      new queffee.Job(((callback) -> callback()), priority_)
 
     it 'performs the first job', ->
       job = nullJob()
@@ -40,10 +37,7 @@ describe 'Worker', ->
         expect(job2.perform).toHaveBeenCalled()
 
       it 'does not automatically picks up the newly added job if is running a job', ->
-        job1 = {
-            perform: (callback) -> @done = callback
-            priority: -> 1
-          }
+        job1 = new queffee.Job ((callback) -> @done = callback), 1
         job2 = nullJob()
         spyOn(job2, 'perform')
         q = new queffee.Q([job1])
@@ -64,7 +58,16 @@ describe 'Worker', ->
         waits(200)
         runs ->
           expect(@job2.perform).toHaveBeenCalled()
+      it "does not picks up the next job when callback never happend without timeout being set", ->
+        runs ->
+          job1 = new queffee.Job( (->), 1 )
+          @job2 = nullJob()
+          spyOn(@job2, 'perform')
+          new queffee.Worker(new queffee.Q([job1, @job2])).start()
 
+        waits(200)
+        runs ->
+          expect(@job2.perform).not.toHaveBeenCalled()
 
       it "went back to idle if the last job timed out", ->
         runs ->
