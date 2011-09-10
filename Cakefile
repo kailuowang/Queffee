@@ -85,7 +85,7 @@ task 'uglify', 'Minify and obfuscate', ->
         final_code = pro.gen_code ast # compressed code here
     
         fs.writeFile prodTargetJsMinFile, final_code
-        fs.unlink prodTargetJsFile, (err) -> handleError(err) if err
+        #fs.unlink prodTargetJsFile, (err) -> handleError(err) if err
         
         message = "Uglified #{prodTargetJsMinFile}"
         util.log message
