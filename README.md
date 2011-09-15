@@ -19,7 +19,7 @@ From project root:
 
     and open SpecRunner.html in browser
 
-## To build min js
+## To build js and min js
 
     cake build
 
@@ -53,6 +53,7 @@ example:
     ).start()
 
 or
+
     new queffee.CollectionWorkQ(
       collection: [item1, item2]
       operation: (item, callback) -> item.someOperation(callback)
