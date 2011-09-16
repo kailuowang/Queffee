@@ -4,12 +4,15 @@ class queffee.Q
 
   constructor: (jobs = [])->
     this._initHeap(jobs)
-    @onNewJobAdded = null
+    @newJobsAddedHandler = []
+
+  jobsAdded: (handler) =>
+    @newJobsAddedHandler.push(handler)
 
   enqueue: (jobs...) =>
     for job in jobs
       @_heap.insert(job)
-    @onNewJobAdded?()
+    this._newJobsAdded()
 
   enQ: (performFn, priorityFn, timeout) =>
     this.enqueue(new queffee.Job(performFn, priorityFn, timeout))
@@ -25,3 +28,7 @@ class queffee.Q
 
   _initHeap: (jobs) =>
     @_heap = new queffee.Heap(jobs, queffee.Q._compareJob)
+
+
+  _newJobsAdded: =>
+    handler() for handler in @newJobsAddedHandler

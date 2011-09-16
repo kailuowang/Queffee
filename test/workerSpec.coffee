@@ -79,4 +79,38 @@ describe 'Worker', ->
         runs ->
           expect(@worker.idle()).toBeTruthy()
 
+    describe "#stop", ->
+      it 'stops picking up next job in the queue when stopped', ->
+        job1 = new queffee.Job ((callback) -> @done = callback), 1
+        job2 = nullJob()
+        spyOn(job2, 'perform')
+        q = new queffee.Q([job1, job2])
+        worker = new queffee.Worker(q)
+        worker.start()
+        worker.stop()
+        job1.done()
+        expect(job2.perform).not.toHaveBeenCalled()
 
+      it 'stops picking new jobs added to the queue', ->
+        job = nullJob()
+        spyOn(job, 'perform')
+        q = new queffee.Q
+        worker = new queffee.Worker(q)
+        worker.start()
+        worker.stop()
+        q.enqueue(job)
+        expect(job.perform).not.toHaveBeenCalled()
+
+
+
+    describe 'multiple workers', ->
+      it 'pick up newly added job', ->
+        q = new queffee.Q
+        worker1 = new queffee.Worker(q)
+        worker2 = new queffee.Worker(q)
+        worker1.start()
+        worker2.start()
+        q.enQ( (->), 0)
+        q.enQ( (->), 1)
+        expect(worker1.idle()).toBeFalsy()
+        expect(worker2.idle()).toBeFalsy()

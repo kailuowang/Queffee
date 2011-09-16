@@ -32,3 +32,12 @@ describe 'Q', ->
       q.clear()
       expect(q.size()).toEqual(0)
       expect(q.dequeue()?).toBeFalsy()
+
+  describe 'jobAdded', ->
+    it 'call the handler when new jobs added', ->
+      q = new queffee.Q
+      worker = {newJobsAdded: (->)}
+      spyOn(worker, 'newJobsAdded')
+      q.jobsAdded(worker.newJobsAdded)
+      q.enQ(null, -> 3)
+      expect(worker.newJobsAdded).toHaveBeenCalled()

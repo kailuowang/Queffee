@@ -1,22 +1,25 @@
 class queffee.Worker
   constructor: (@q, @onIdle) ->
-    @idle_ = true
-    @q.onNewJobAdded = =>
-      this._work()
+    @_idle = true
+    @q.jobsAdded this._work
+    @_stopped = false
 
   start: =>
+    @_stopped = false
     this._work()
 
-  idle: => @idle_
+  stop: => @_stopped = true
+
+  idle: => @_idle
 
   _work: =>
-    if @idle_
+    if @_idle and !@_stopped
       job = @q.dequeue()
-      if @idle_ = !job?
+      if @_idle = !job?
         @onIdle?()
       else
         job.perform this._onJobDone
 
   _onJobDone: =>
-    @idle_ = true
+    @_idle = true
     this._work()
