@@ -1,13 +1,11 @@
 class queffee.Q
-  @_compareJob: (jobA, jobB) =>
-    jobA.priority() > jobB.priority()
+  @_compareJob: (jobA, jobB) => jobA.priority() > jobB.priority()
 
   constructor: (jobs = [])->
     this._initHeap(jobs)
     @newJobsAddedHandler = []
 
-  jobsAdded: (handler) =>
-    @newJobsAddedHandler.push(handler)
+  jobsAdded: (handler) => @newJobsAddedHandler.push(handler)
 
   enqueue: (jobs...) =>
     for job in jobs
@@ -17,8 +15,7 @@ class queffee.Q
   enQ: (performFn, priorityFn, timeout) =>
     this.enqueue(new queffee.Job(performFn, priorityFn, timeout))
 
-  dequeue: =>
-    @_heap.extractTop()
+  dequeue: => @_heap.extractTop()
 
   reorder: => @_heap.reorder()
 
@@ -28,7 +25,6 @@ class queffee.Q
 
   _initHeap: (jobs) =>
     @_heap = new queffee.Heap(jobs, queffee.Q._compareJob)
-
 
   _newJobsAdded: =>
     handler() for handler in @newJobsAddedHandler
