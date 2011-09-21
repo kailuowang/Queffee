@@ -24,7 +24,7 @@ class queffee.Q
 
   size: => @_heap.size()
 
-  clear: => @_heap = this._initHeap([])
+  clear: => this._initHeap([])
 
   _initHeap: (jobs) =>
     @_heap = new queffee.Heap(jobs, queffee.Q._compareJob)
