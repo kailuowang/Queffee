@@ -1,5 +1,5 @@
 class queffee.Job
-  #@peform is a function that takes in a callback function as parameter and will call the call back upon finish
+  #@_peform must be a function that takes in a callback function as parameter and will call the call back upon finish
   constructor: (@_perform, @_priority, @_timeout) ->
 
   priority: =>

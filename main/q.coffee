@@ -12,8 +12,8 @@ class queffee.Q
       @_heap.insert(job)
     this._newJobsAdded()
 
-  enQ: (performFn, priorityFn, timeout) =>
-    this.enqueue(new queffee.Job(performFn, priorityFn, timeout))
+  enQ: (performFn, priority = this._priorityBySequence(), timeout) =>
+    this.enqueue(new queffee.Job(performFn, priority, timeout))
 
   dequeue: => @_heap.extractTop()
 
@@ -22,6 +22,8 @@ class queffee.Q
   size: => @_heap.size()
 
   clear: => this._initHeap([])
+
+  _priorityBySequence: => - 1 - this.size()
 
   _initHeap: (jobs) =>
     @_heap = new queffee.Heap(jobs, queffee.Q._compareJob)

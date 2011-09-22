@@ -10,6 +10,33 @@ describe 'Q', ->
       expect(q.dequeue()).toEqual(mediumP)
       expect(q.dequeue()).toEqual(lowP)
 
+  describe 'enQ', ->
+    it 'orders the job according to the priority passed in', ->
+      q = new queffee.Q
+      justDone = 0
+      q.enQ (-> justDone = 2), 2
+      q.enQ (-> justDone = 1), 3
+      q.enQ (-> justDone = 3), 1
+      q.dequeue().perform()
+      expect(justDone).toEqual(1)
+      q.dequeue().perform()
+      expect(justDone).toEqual(2)
+      q.dequeue().perform()
+      expect(justDone).toEqual(3)
+
+    it 'orders the jobs according to the sequence added when no priority is provided', ->
+      q = new queffee.Q
+      justDone = 0
+      q.enQ(-> justDone = 1)
+      q.enQ(-> justDone = 2)
+      q.enQ(-> justDone = 3)
+      q.dequeue().perform()
+      expect(justDone).toEqual(1)
+      q.dequeue().perform()
+      expect(justDone).toEqual(2)
+      q.dequeue().perform()
+      expect(justDone).toEqual(3)
+
   describe 'reorder', ->
     it 'reorder the queue according to new priority', ->
       q = new queffee.Q
