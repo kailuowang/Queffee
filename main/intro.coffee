@@ -1,6 +1,8 @@
 ###
+queffee
+- A js dynamic priority work queue
 
-A js dynamic priority work queue
+version: 1.0RC1
 
 Copyright (c) 2011 Kailuo Wang
 
