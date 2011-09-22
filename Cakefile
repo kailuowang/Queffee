@@ -82,7 +82,7 @@ task 'uglify', 'Minify and obfuscate', ->
         ast = jsp.parse fileContents  # parse code and get the initial AST
         ast = pro.ast_mangle ast # get a new AST with mangled names
         ast = pro.ast_squeeze ast # get an AST with compression optimizations
-        final_code = pro.gen_code ast # compressed code here
+        final_code = (pro.gen_code ast) + ';' # compressed code here
     
         fs.writeFile prodTargetJsMinFile, final_code
         #fs.unlink prodTargetJsFile, (err) -> handleError(err) if err
