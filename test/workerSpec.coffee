@@ -101,8 +101,6 @@ describe 'Worker', ->
         q.enqueue(job)
         expect(job.perform).not.toHaveBeenCalled()
 
-
-
     describe 'multiple workers', ->
       it 'pick up newly added job', ->
         q = new queffee.Q
@@ -110,7 +108,29 @@ describe 'Worker', ->
         worker2 = new queffee.Worker(q)
         worker1.start()
         worker2.start()
-        q.enQ( (->), 0)
-        q.enQ( (->), 1)
+        q.enQ(->)
+        q.enQ(->)
         expect(worker1.idle()).toBeFalsy()
         expect(worker2.idle()).toBeFalsy()
+
+    describe '#retry', ->
+      it 'retries the stuck job and continue', ->
+        job1Stuck = true
+        job2Done = false
+        job1 = ((callback) -> callback() unless job1Stuck)
+        job2 = ((callback) -> job2Done = true ; callback())
+        q = new queffee.Q
+        worker = new queffee.Worker(q)
+        q.enQ job1
+        q.enQ job2
+        expect(job2Done).toBeFalsy()
+        job1Stuck = false
+        worker.retry()
+        expect(job2Done).toBeTruthy()
+
+      it 'does nothing if idle', ->
+        q = new queffee.Q
+        worker = new queffee.Worker(q)
+        q.enqueue nullJob()
+        worker.retry()
+

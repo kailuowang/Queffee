@@ -1,8 +1,8 @@
 class queffee.Worker
-  constructor: (@q, @onIdle) ->
-    @_idle = true
+  #starts immediately unless set true in the last parameter
+  constructor: (@q, @onIdle, @_stopped = false) ->
+    @_job = null
     @q.jobsAdded this._work
-    @_stopped = false
 
   start: =>
     @_stopped = false
@@ -10,16 +10,22 @@ class queffee.Worker
 
   stop: => @_stopped = true
 
-  idle: => @_idle
+  idle: => !@_job?
+
+  retry: => this._kickOffJob() unless this.idle()
 
   _work: =>
-    if @_idle and !@_stopped
-      job = @q.dequeue()
-      if @_idle = !job?
+    if this.idle() and !@_stopped
+      this._pickupJob()
+      if this.idle()
         @onIdle?()
       else
-        job.perform this._onJobDone
+        this._kickOffJob()
 
   _onJobDone: =>
-    @_idle = true
+    @_job = null
     this._work()
+
+  _kickOffJob: => @_job.perform this._onJobDone
+
+  _pickupJob: => @_job = @q.dequeue()
