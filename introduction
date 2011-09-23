@@ -1,0 +1,118 @@
+Recently I wrote a very simple javascript library that helps manage asynchronous tasks. I named it queffee (<a href='http://github.com/kailuowang/Queffee'>github</a>).  It was written in coffeescript but the compiled javascript file is available too. This article gives an introduction about this library and how it can help a web application on the client side.
+
+queffee.js is a small library and for the most part it has two public classes: queffee.Q - a dynamic priority job queue and queffee.Worker - well, a worker. You can enqueue tasks (asynchronous functions) into the queue and start a worker, then the worker will run those functions one by one. You can also start multiple workers can they will work on multiple tasks in parallel (in a single thread).
+
+As an example ajax web application, let's look at a picture slide show running in a browser.
+Let's start with the basic usage. In the slide show, there are many picture objects, which have a preload function that preloads the picture content to the browser so that when user select to display them, they will be immediately ready. This preload function is asynchronous and takes in a callback to call when the preload is done.
+<pre class='prettyprint'>
+  class Picture
+    preload: (callback) =>
+      #preloading itself in browser, callback on success
+</pre>
+You can always simply do
+<pre class='prettyprint'>
+  for pic in pictures
+    picture.preload()
+</pre>
+The issue here is that because preload is asynchronous, this will run all of them simultaneously, so if you have too many pictures, that might be simply too many requests to the server. You can better manage that using queffee.
+<pre class='prettyprint'>
+    q = new queffee.Q
+    worker = new queffee.Worker(q)
+    for pic in pictures
+      q.enQ picture.preload
+</pre>
+
+The worker will preload picture one after another, so one request at a time. If you want more simultaneous connections you can always start more workers.
+<pre class='prettyprint'>
+  anotherWorker = new queffee.Worker(q)
+</pre>
+or
+<pre class='prettyprint'>
+  _(4).times -> new queffee.Worker(q)
+</pre>
+
+Now let's look at a more advanced use case. In a slide show, users might select to skip some pictures and jump to a picture further down in slide. So preloading the pictures they already skipped is probably not as important as preloading the pictures immediately after the one they are seeing now. So we need to prioritize the preloading according to the current progress of the user. queffee supports that. When you enQ, you can give it a priority function and it will be used for the priority queue. Let's say you added a priority function to your picture class
+<pre class='prettyprint'>
+  class Picture
+    priority: =>
+      #calculates its priority according to the distance to the current progress
+</pre>
+then you can enQ the preloads like the following
+<pre class='prettyprint'>
+   q.enQ picture.preload, picture.priority
+</pre>
+Now when users skip pictures, you just need to call
+<pre class='prettyprint'>
+   q.reorder()
+</pre>
+Then the preloading works will be re-prioritized according to the new slideshow progress.
+If you don't need to dynamically prioritize the tasks, you can also pass in a number value as the priority.
+
+So far so good right? Another really interesting usage of queffee is to support offline mode for you ajax application.
+Back to the picture slide show as the example. With enough preloaded pictures, it should be able to work fine after the browser goes offline. However, like most other ajax web apps, even with the data available locally, it still needs to update state back to server. Specifically in this app, if user operated on the picture, it needs to update the server with the latest states. More specifically, it needs to send ajax put/post requests back to the server. We don't really need a response from the server but if the browser goes offline, such ajax requests will be lost. With queffee, the problem can be elegantly solved with the following code.
+<pre class='prettyprint'>
+  class Updater
+    constructor: ->
+      @_q = new queffee.Q
+      @_worker = new queffee.Worker(@_q)
+
+    put: (url, data) => this._addJob('put', url, data)
+
+    post: (url, data) => this._addJob('post', url, data)
+
+    _addJob: (method, url, data) =>
+      @_q.enQ (callback) =>
+        $.ajax(
+                url: url
+                data: data
+                type: type
+                success: callback
+                error: => setTimeout(@_worker.retry, 180000)
+              )
+</pre>
+Then just use this updater to do the ajax update
+<pre class='prettyprint'>
+  class Picture
+    update: => updater.put('/picture', this)
+</pre>
+That's it. The picture.update() methods is offline safe now. The Updater class uses queffee to run the ajax requests one by one. If disconnection causes one ajax request to fail, it will automatically retry every 3 minutes until it succeeds and continue with the following one. The way it detects the disconnection is a bit naive here but you got the idea.
+There are two not so obvious things here: 1) the worker will not proceed to the next job until the current job finishes and calls callback, so if the ajax call in the current job fails, the worker will stay with the current job 2) the worker.retry() function re-run current job again which if succeeds, will start moving things again.
+
+Some other features provided by queffee:
+<h4>
+Timeout setting.
+</h4>
+Be default queffee.Worker waits on the asynchronous task indefinitely, but if you give it a ms timeout (value or function), it will move on the next task after timeout.
+For example, the following code waits at most 10 seconds for the picture to finish reload, after which the next picture will get preloaded.
+<pre class='prettyprint'>
+   q.enQ picture.preload, picture.priority, 10000
+</pre>
+<h4>
+Collection worker queue.
+</h4>
+In some cases you have a collection of asynchronous tasks and you want to run all of them sequentially and meanwhile monitor the progress. I wrote a util class in queffee called CollectionWorkQ just for that.
+Here is the usage, let's still take the preloading pictures as the example, except this time we don't care about the priority but we need to monitor the progress.
+<pre class='prettyprint'>
+    new queffee.CollectionWorkQ(
+      collection: pictures
+      operation: 'preload'
+      onProgress: -> alert('another picture ready!')
+      onFinish: -> alert('finished')
+    ).start()
+</pre>
+This should be intuitive enough, the operation option takes in a function name that will be called on each item of the collection. The operation option can also be a function that takes in an item and a callback like the following
+<pre class='prettyprint'>
+    new queffee.CollectionWorkQ(
+      collection: pictures
+      operation: (picture, callback) -> picture.preload(callback)
+    ).start()
+</pre>
+
+That's it. Thanks for reading this. I hope it can be of usage for your projects. Again, it's on <a href='http://github.com/kailuowang/Queffee'>github</a>, any contribution will be great.
+
+
+
+
+
+
+

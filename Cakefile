@@ -6,7 +6,7 @@ uglify = require './node_modules/uglify-js'
 srcCoffeeDir     = 'main'
 testSrcCoffeeDir     = 'test'
 
-prodTargetJsDir      = 'output/production'
+prodTargetJsDir      = 'release'
 testTargetJsDir      = 'output/test'
 devTargetJsDir       = 'output/development'
 
