@@ -11,6 +11,12 @@ Based on the change to module management in [`npm` v1.0+](http://blog.nodejs.org
 
 You shouldn't have to install them with `npm`.  If you're not running OS X, or don't have Growl available, you obviously won't see any pretty notifications.  But it should be trivial to replace that function with your OS specific variant if you'd like to.
 
+## To use
+No other dependencies at all simply: 
+[queffee.js](https://raw.github.com/kailuowang/Queffee/master/release/queffee.js)
+or 
+[queffee.min.js](https://github.com/kailuowang/Queffee/raw/master/release/queffee.min.js)
+
 ## To do TDD
 
 From project root:
@@ -66,6 +72,8 @@ or
       onProgress: -> count++
       onFinish: -> alert('finished')
     ).start()
+
+[Here is more examples of it](http://kailuowang.blogspot.com/2011/09/queffeejs-dynamic-priority-worker-queue.html)
 
 ## Acknowledgment
 * used skeleton project [InstantJasmineCoffee](https://github.com/krismolendyke/InstantJasmineCoffee "InstantJasmineCoffee")
