@@ -16,7 +16,7 @@ No other dependencies at all, simply:
 
 [queffee.js](https://raw.github.com/kailuowang/Queffee/master/release/queffee.js)
 or 
-[queffee.min.js](https://github.com/kailuowang/Queffee/raw/master/release/queffee.min.js)
+[queffee.min.js](https://github.com/kailuowang/Queffee/raw/master/release/queffee.min.js) (7.4k)
 
 ## To do TDD
 
