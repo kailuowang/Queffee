@@ -1,0 +1,251 @@
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
+
+  <title>Queffee</title>
+  <meta name="description" content="A small dynamic priority work queue library in Coffeescript. ">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+    <header>
+      <h1 class="title">Queffee</h1>
+    </header>
+    <div id="container">
+      <p class="tagline">A small dynamic priority work queue library in Coffeescript. </p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/kailuowang/Queffee/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/kailuowang/Queffee/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/kailuowang/Queffee" class="code">fork Queffee on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <p>queffee.js is a small library and for the most part it has two public classes: queffee.Q - a dynamic priority job queue and queffee.Worker - well, a worker. You can enqueue tasks (asynchronous functions) into the queue and start a worker, then the worker will run those functions one by one. You can also start multiple workers can they will work on multiple tasks in parallel (in a single thread).</p>
+
+<h3>Incentive</h3>
+
+<p>As an example ajax web application, let's look at a picture slide show running in a browser.
+Let's start with the basic usage. In the slide show, there are many picture objects, which have a preload function that preloads the picture content to the browser so that when user select to display them, they will be immediately ready. This preload function is asynchronous and takes in a callback to call when the preload is done.:</p>
+
+<pre><code>  class Picture
+    preload: (callback) =&gt;
+      #preloading itself in browser, callback on success
+</code></pre>
+
+<p>You can always simply do</p>
+
+<pre><code>  for pic in pictures
+    picture.preload()
+</code></pre>
+
+<p>The issue here is that because preload is asynchronous, this will run all of them simultaneously, so if you have too many pictures, that might be simply too many requests to the server. You can better manage that using queffee.</p>
+
+<h3>Basic Usage</h3>
+
+<pre><code>    q = new queffee.Q
+    worker = new queffee.Worker(q)
+    for pic in pictures
+      q.enQ picture.preload
+</code></pre>
+
+<p>The worker will preload picture one after another, so one request at a time. If you want more simultaneous connections you can always start more workers.</p>
+
+<pre><code>  anotherWorker = new queffee.Worker(q)
+  #or
+  _(4).times -&gt; new queffee.Worker(q)
+</code></pre>
+
+<h3>Dynamic Priority</h3>
+
+<p>Now let's look at a more advanced use case. In a slide show, users might select to skip some pictures and jump to a picture further down in slide. So preloading the pictures they already skipped is probably not as important as preloading the pictures immediately after the one they are seeing now. So we need to prioritize the preloading according to the current progress of the user. queffee supports that. When you enQ, you can give it a priority function and it will be used for the priority queue. Let's say you added a priority function to your picture class</p>
+
+<pre><code>  class Picture
+    priority: =&gt;
+      #calculates its priority according to the distance to the current progress
+</code></pre>
+
+<p>then you can enQ the preloads like the following</p>
+
+<pre><code>   q.enQ picture.preload, picture.priority
+</code></pre>
+
+<p>Now when users skip pictures, you just need to call</p>
+
+<pre><code>   q.reorder()
+</code></pre>
+
+<p>Then the preloading works will be re-prioritized according to the new slideshow progress.
+If you don't need to dynamically prioritize the tasks, you can also pass in a number value as the priority.</p>
+
+<h3>Add Offline Support to Your Front End</h3>
+
+<p>So far so good right? Another really interesting usage of queffee is to support offline mode for you ajax application. 
+Back to the picture slide show as the example. With enough preloaded pictures, it should be able to work fine after the browser goes offline. However, like most other ajax web apps, even with the data available locally, it still needs to update state back to server. Specifically in this app, if user operated on the picture, it needs to update the server with the latest states. More specifically, it needs to send ajax put/post requests back to the server. We don't really need a response from the server but if the browser goes offline, such ajax requests will be lost. With queffee, the problem can be elegantly solved with the following code.</p>
+
+<pre><code>  class Updater
+    constructor: -&gt;
+      @_q = new queffee.Q
+      @_worker = new queffee.Worker(@_q)
+
+    put: (url, data) =&gt; this._addJob('put', url, data)
+
+    post: (url, data) =&gt; this._addJob('post', url, data)
+
+    _addJob: (method, url, data) =&gt;
+      @_q.enQ (callback) =&gt;
+        $.ajax(
+                url: url
+                data: data
+                type: type
+                success: callback
+                error: =&gt; setTimeout(@_worker.retry, 180000)
+              )
+</code></pre>
+
+<p>Then just use this updater to do the ajax update</p>
+
+<pre><code>  class Picture
+    update: =&gt; updater.put('/picture', this)
+</code></pre>
+
+<p>That's it. The picture.update() methods is offline safe now. The Updater class uses queffee to run the ajax requests one by one. If disconnection causes one ajax request to fail, it will automatically retry every 3 minutes until it succeeds and continue with the following one. The way it detects the disconnection is a bit naive here but you got the idea. 
+There are two not so obvious things here: 1) the worker will not proceed to the next job until the current job finishes and calls callback, so if the ajax call in the current job fails, the worker will stay with the current job 2) the worker.retry() function re-run current job again which if succeeds, will start moving things again. </p>
+
+<h3>Working with synchronous functions</h3>
+
+<p>You can also queue work using a synchronized parameterless function, queffee will run it asynchronously.</p>
+
+<pre><code>  doSomething = -&gt;
+    #...some time consuming synchronous process
+
+  q = new queffee.Q
+  q.enQ(doSomething)
+  #or
+  job = new queffee.Job(doSomething, priority: 0, timeout: 2000)
+  q.enqueue(job)
+</code></pre>
+
+<p>This way you can also use queffee to manage a set of time consuming synchronous tasks, parallelize them (by using multiple workers), prioritize them and so on.</p>
+
+<h3>Tweaking queffee</h3>
+
+<p>By default queffee.Worker waits on the asynchronous task indefinitely, but if you give it a ms timeout (value or function), it will move on the next task after timeout.
+For example, the following code waits at most 10 seconds for the picture to finish reload, after which the next picture will get preloaded.</p>
+
+<pre><code>   q.enQ picture.preload, picture.priority, 10000
+</code></pre>
+
+<h3>Some Utils</h3>
+
+<p>In some cases you have a collection of asynchronous tasks and you want to run all of them sequentially and meanwhile monitor the progress. I wrote a util class in queffee called CollectionWorkQ just for that.
+Here is the usage, let's still take the preloading pictures as the example, except this time we don't care about the priority but we need to monitor the progress.</p>
+
+<pre><code>    new queffee.CollectionWorkQ(
+      collection: pictures
+      operation: 'preload'
+      onProgress: -&gt; alert('another picture ready!')
+      onFinish: -&gt; alert('finished')
+    ).start()
+</code></pre>
+
+<p>This should be intuitive enough, the operation option takes in a function name that will be called on each item of the collection. The operation option can also be a function that takes in an item and a callback like the following</p>
+
+<pre><code>    new queffee.CollectionWorkQ(
+      collection: pictures
+      operation: (picture, callback) -&gt; picture.preload(callback)
+    ).start()
+</code></pre>
+
+<h3>Real Life Performance</h3>
+
+<p>The core data structure of queffee is an array based binary heap as the queue. queffee has been tested as part of a real web application on machines with low process power such as the original Chromebook and Android tablets. The application ran smoothly with thousands of work tasks and reordering of the whole queue a couple of times every second.  </p>
+
+<h3>To do TDD</h3>
+
+<p>Based on the change to module management in <a href="http://blog.nodejs.org/2011/03/23/npm-1-0-global-vs-local-installation/" title="npm 1.0: Global vs Local installation &amp;laquo; node blog"><code>npm</code> v1.0+</a>, the following modules are now local to this project:</p>
+
+<ul>
+<li><a href="https://github.com/jashkenas/coffee-script">coffee-script</a></li>
+<li><a href="https://github.com/mishoo/UglifyJS">uglify-js</a></li>
+<li>
+<a href="https://github.com/visionmedia/node-growl">growl</a>, which requires <a href="http://growl.info/extras.php#growlnotify" title="Growl - Extras">growlnotify</a> to be available on your <code>PATH</code>
+</li>
+</ul><p>You shouldn't have to install them with <code>npm</code>.  If you're not running OS X, or don't have Growl available, you obviously won't see any pretty notifications.  But it should be trivial to replace that function with your OS specific variant if you'd like to.
+From project root:</p>
+
+<pre><code>$  cake watch:development
+</code></pre>
+
+<p>and open SpecRunner.html in browser</p>
+
+<h3>To build js and min js</h3>
+
+<pre><code>$  cake build
+</code></pre>
+
+<h3>Acknowledgment</h3>
+
+<ul>
+<li>used skeleton project <a href="https://github.com/krismolendyke/InstantJasmineCoffee" title="InstantJasmineCoffee">InstantJasmineCoffee</a>
+</li>
+</ul><h3>License</h3>
+
+<p>Copyright (c) 2011 Kailuo Wang</p>
+
+<p>Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.</p>
+        </article>
+      </div>
+    </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/kailuowang" class="avatar"><img src="https://secure.gravatar.com/avatar/c573cf31007f29236e1641e492bee036?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/kailuowang">kailuowang</a> maintains <a href="https://github.com/kailuowang/Queffee">Queffee</a></p>
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/kailuowang/Queffee/tarball/master" class="tar">tar</a><a href="https://github.com/kailuowang/Queffee/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
+</html>
