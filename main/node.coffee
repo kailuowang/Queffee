@@ -3,49 +3,49 @@ class queffee.Node
   constructor: (@array, @index, @comp = (a,b) -> a > b ) ->
 
   value: (newVal) =>
-    if newVal? and this._valid()
+    if newVal? and @_valid()
       @array[@index] = newVal
     else
       @array[@index]
 
   left: =>
-    @_left ?= this.child_(2 * @index + 1)
+    @_left ?= @child_(2 * @index + 1)
 
   right: =>
-    @_right ?=  this.child_(2 * @index + 2)
+    @_right ?=  @child_(2 * @index + 2)
 
   parent: =>
     @_parent ?= new Node(@array, Math.floor(@index / 2), @comp)
 
   heapify: =>
-    if this.left()? then this.left().heapify()
-    if this.right()? then this.right().heapify()
-    this.siftDown()
+    if @left()? then @left().heapify()
+    if @right()? then @right().heapify()
+    @siftDown()
 
   siftDown: =>
-    smallerChild = this._findSmallerChildren()
-    if smallerChild? and this._comp(smallerChild, this)
-      this._swap(smallerChild)
+    smallerChild = @_findSmallerChildren()
+    if smallerChild? and @_comp(smallerChild, this)
+      @_swap(smallerChild)
       smallerChild.siftDown()
 
   siftUp: =>
-    unless this._isRoot()
-      if this._comp(this, this.parent())
-        this._swap this.parent()
-        this.parent().siftUp()
+    unless @_isRoot()
+      if @_comp(this, @parent())
+        @_swap @parent()
+        @parent().siftUp()
 
   child_: (childIndex) =>
     if (childIndex < @array.length) then new Node(@array, childIndex, @comp) else null
 
   _findSmallerChildren: =>
-    if this.left()? and this.right()?
-      if this._comp(this.left(), this.right()) then this.left() else this.right()
+    if @left()? and @right()?
+      if @_comp(@left(), @right()) then @left() else @right()
     else
-      if this.left()? then this.left() else this.right()
+      if @left()? then @left() else @right()
 
   _swap: (that) =>
-    tmp = this.value()
-    this.value(that.value())
+    tmp = @value()
+    @value(that.value())
     that.value(tmp)
 
   _isRoot: => @index is 0
