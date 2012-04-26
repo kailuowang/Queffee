@@ -23,13 +23,20 @@ Suppose you have two asyn functions: doSomething and doSomethingHigher, both tak
     q.reorder()   #you can call this to reorder the jobs based on their priority functions
     
     #you can also create an array of queffee.Job (constructor using the same signature as enQ) and create the q using the array
-    job1 = new queffee.Job( (callback) -> doSomething1(callback), 1)
-    job2 = new queffee.Job( (callback) -> doSomething2(callback), 0, 2000)
+    job1 = new queffee.Job( (callback) -> doSomething1(callback), priority: 1)
+    job2 = new queffee.Job( (callback) -> doSomething2(callback), priority: 0, timeout: 2000)
     q = new queffee.Q([job1, job2])
     
     #or
     q.enqueue(job1)
     q.enqueue(job2)
+
+You can also create enQ work or create job using a synchronized parameterless function, queffee will run it asynchronously.
+    doSomething = ->
+      #...do something here
+    q.enQ(doSomething)
+    new queffee.Job( doSomething, priority: 0, timeout: 2000)
+
     
 The doSomethingHigher will be performed first, and then doSomething. Notice that the second parameter of enQ is the priority, it can be a function or a value.
 If your works priority is dynamic using the priority function, you can call q.reorder() to re-prioritize you queue whenever you deem appropriate.

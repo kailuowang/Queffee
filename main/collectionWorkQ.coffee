@@ -24,7 +24,7 @@ class queffee.CollectionWorkQ
         (callback) =>
           @operation(item, => this._itemDone(index, callback))
 
-    new queffee.Job( jobFn , -index)
+    new queffee.Job(jobFn, priority: -index)
 
   _itemDone:(index, callback) =>
     @onProgress?(index + 1)

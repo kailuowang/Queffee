@@ -2,7 +2,7 @@ describe 'Worker', ->
   describe '#start', ->
 
     nullJob = (priority_ = 1) ->
-      new queffee.Job(((callback) -> callback()), priority_)
+      new queffee.Job(((callback) -> callback()),  priority: priority_)
 
     it 'performs the first job', ->
       job = nullJob()
@@ -50,7 +50,7 @@ describe 'Worker', ->
     describe "when timeout set on job", ->
       it "picks up the next job after timeout even when callback never happend", ->
         runs ->
-          job1 = new queffee.Job( (->), 1, 100 )
+          job1 = new queffee.Job( (->),  priority: 1, timeout: 100 )
           @job2 = nullJob()
           spyOn(@job2, 'perform')
           new queffee.Worker(new queffee.Q([job1, @job2])).start()
@@ -60,7 +60,7 @@ describe 'Worker', ->
           expect(@job2.perform).toHaveBeenCalled()
       it "does not picks up the next job when callback never happend without timeout being set", ->
         runs ->
-          job1 = new queffee.Job( (->), 1 )
+          job1 = new queffee.Job( ((callback)-> ),  priority: 1 )
           @job2 = nullJob()
           spyOn(@job2, 'perform')
           new queffee.Worker(new queffee.Q([job1, @job2])).start()
@@ -71,7 +71,7 @@ describe 'Worker', ->
 
       it "went back to idle if the last job timed out", ->
         runs ->
-          job1 = new queffee.Job( (->), 1, 100 )
+          job1 = new queffee.Job( (->),  priority: 1, timeout: 100 )
           @worker = new queffee.Worker(new queffee.Q([job1]))
           @worker.start()
 
@@ -131,6 +131,6 @@ describe 'Worker', ->
       it 'does nothing if idle', ->
         q = new queffee.Q
         worker = new queffee.Worker(q)
-        q.enqueue nullJob()
+        q.  enqueue nullJob()
         worker.retry()
 

@@ -1,7 +1,7 @@
 class queffee.Heap
   constructor: (@_array = [], @comp = (a, b) -> a > b) ->
-    this._init()
-    this.reorder()
+    @_init()
+    @reorder()
 
   size: =>
     @_array.length
@@ -11,14 +11,14 @@ class queffee.Heap
   extractTop: =>
     retVal = this.top()
     newRootVal = @_array.pop()
-    this._init()
+    @_init()
     @_root.value(newRootVal)
     @_root.siftDown()
     retVal
 
   insert: (newItem) =>
     @_array.push(newItem)
-    this._last().siftUp()
+    @_last().siftUp()
 
   reorder: =>
     @_root.heapify()

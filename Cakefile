@@ -121,6 +121,6 @@ watch = (srcDir, opts) ->
   fs.readdir srcDir, (err, files) ->
     handleError(err) if err
     for file in files then do (file) ->
-      fs.watchFile "#{srcDir}/#{file}", (curr, prev) ->
+      fs.watch "#{srcDir}/#{file}", (curr, prev) ->
         if +curr.mtime isnt +prev.mtime
           coffee opts, "#{srcDir}/#{file}"
