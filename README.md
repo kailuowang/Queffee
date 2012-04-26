@@ -32,6 +32,7 @@ Suppose you have two asyn functions: doSomething and doSomethingHigher, both tak
     q.enqueue(job2)
 
 You can also create enQ work or create job using a synchronized parameterless function, queffee will run it asynchronously.
+    
     doSomething = ->
       #...do something here
     q.enQ(doSomething)
