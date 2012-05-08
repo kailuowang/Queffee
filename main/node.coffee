@@ -9,10 +9,10 @@ class queffee.Node
       @array[@index]
 
   left: =>
-    @_left ?= @child_(2 * @index + 1)
+    @_left ?= @_child(2 * @index + 1)
 
   right: =>
-    @_right ?=  @child_(2 * @index + 2)
+    @_right ?= @_child(2 * @index + 2)
 
   parent: =>
     @_parent ?= new Node(@array, Math.floor(@index / 2), @comp)
@@ -34,7 +34,7 @@ class queffee.Node
         @_swap @parent()
         @parent().siftUp()
 
-  child_: (childIndex) =>
+  _child: (childIndex) =>
     if (childIndex < @array.length) then new Node(@array, childIndex, @comp) else null
 
   _findSmallerChildren: =>

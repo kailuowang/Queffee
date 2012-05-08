@@ -1,21 +1,21 @@
 class queffee.Worker
   #starts immediately unless set true in the last parameter
-  constructor: (@q, @onIdle, @_stopped = false) ->
+  constructor: (@q, @onIdle, @_turnedOff = false) ->
     @_job = null
     @q.jobsAdded @_work
 
   start: =>
-    @_stopped = false
+    @_turnedOff = false
     @_work()
 
-  stop: => @_stopped = true
+  stop: => @_turnedOff = true
 
   idle: => !@_job?
 
   retry: => @_kickOffJob() unless @idle()
 
   _work: =>
-    if @idle() and !@_stopped
+    if @idle() and !@_turnedOff
       @_pickupJob()
       if @idle()
         @onIdle?()
