@@ -10,7 +10,7 @@ describe 'Job', ->
       expect(new queffee.Job(null, priority: -> 0).priority()).toEqual(0)
 
   describe 'perform', ->
-    it 'runs the async function and runs it', ->
+    it 'runs an async function that takes in a callback', ->
       doSomething = jasmine.createSpy()
       workerCallback = jasmine.createSpy()
       fake_asyn_fun = (callback) ->
@@ -21,6 +21,25 @@ describe 'Job', ->
       expect(doSomething).toHaveBeenCalled()
       expect(workerCallback).toHaveBeenCalled()
       expect(job.running).toBeFalsy()
+
+    it 'runs the async function that returns a promise', ->
+      dfd = $.Deferred()
+      doSomething = jasmine.createSpy('real work')
+      workerCallback = jasmine.createSpy('worker call back')
+      asyn_fn_with_promise = ->
+        doSomething()
+        dfd.promise()
+      job = new queffee.Job(asyn_fn_with_promise)
+      runs ->
+        job.perform(workerCallback)
+      waits(200)
+      runs ->
+        expect(doSomething).toHaveBeenCalled()
+        expect(workerCallback).not.toHaveBeenCalled()
+        expect(job.running).toBeTruthy()
+        dfd.resolve('success')
+        expect(workerCallback).toHaveBeenCalled()
+        expect(job.running).toBeFalsy()
 
     it 'run a synchronezed method asynchronously', ->
       fake_sync_func = jasmine.createSpy()

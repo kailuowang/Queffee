@@ -21,11 +21,13 @@ class queffee.Job
       @_perform(@_done)
     else if @_perform.length is 0
       setTimeout =>
-        @_perform()
-        @_done()
+        result = @_perform()
+        if result?.then? #the function returns a promise
+          result.then @_done
+        else
+          @_done()
     else
-      throw "#{@_perform} should be either an async function that takes in callback function as a parameter or a synchronized function that does not have any arguments."
-
+      throw "#{@_perform} should be either an async function that takes in callback function as a parameter or a synchronized function that does take have any arguments."
 
   _done: =>
     if @running

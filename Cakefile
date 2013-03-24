@@ -8,7 +8,7 @@ testSrcCoffeeDir     = 'test'
 
 prodTargetJsDir      = 'release'
 testTargetJsDir      = 'output/test'
-devTargetJsDir       = 'output/development'
+devTargetJsDir       = 'output/main'
 
 prodTargetFileName   = 'queffee'
 prodTargetCoffeeFile = "#{srcCoffeeDir}/#{prodTargetFileName}.coffee"
@@ -121,6 +121,5 @@ watch = (srcDir, opts) ->
   fs.readdir srcDir, (err, files) ->
     handleError(err) if err
     for file in files then do (file) ->
-      fs.watch "#{srcDir}/#{file}", (curr, prev) ->
-        if +curr.mtime isnt +prev.mtime
-          coffee opts, "#{srcDir}/#{file}"
+      fs.watch "#{srcDir}/#{file}",{}, ->
+        coffee opts, "#{srcDir}/#{file}"
