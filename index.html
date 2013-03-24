@@ -45,7 +45,7 @@ Let's start with the basic usage. In the slide show, there are many picture obje
 
 <pre><code>  class Picture
     preload: (callback) =&gt;
-      #preloading itself in browser, callback on success
+      #preloading itself in browser, call callback on success
 </code></pre>
 
 <p>You can always simply do</p>
@@ -70,6 +70,20 @@ Let's start with the basic usage. In the slide show, there are many picture obje
   #or
   _(4).times -&gt; new queffee.Worker(q)
 </code></pre>
+
+<p>In the example, the asynchronous <code>preload</code> function takes in a callback which will be called when the preload is done. queffee can also work with asynchronous functions that return a promise which resolves when the work is done. </p>
+
+<pre><code>  class Picture
+    preload: () =&gt;
+      deferred = $.Deferred()
+      #preloading itself in browser, resolve the deferred on success
+      deferred.promise()
+
+  for pic in pictures
+    q.enQ picture.preload 
+</code></pre>
+
+<p>For detailed examples of how to use a promise, you can go to <a href="http://api.jquery.com/deferred.then/">jQuery.deferred</a> (although all queffee is not dependent on jQuery deferred, all it needs from that promise is that it has a <code>then</code> function that takes in a callback) </p>
 
 <h3>Dynamic Priority</h3>
 
@@ -126,21 +140,6 @@ Back to the picture slide show as the example. With enough preloaded pictures, i
 
 <p>That's it. The picture.update() methods is offline safe now. The Updater class uses queffee to run the ajax requests one by one. If disconnection causes one ajax request to fail, it will automatically retry every 3 minutes until it succeeds and continue with the following one. The way it detects the disconnection is a bit naive here but you got the idea. 
 There are two not so obvious things here: 1) the worker will not proceed to the next job until the current job finishes and calls callback, so if the ajax call in the current job fails, the worker will stay with the current job 2) the worker.retry() function re-run current job again which if succeeds, will start moving things again. </p>
-
-<h3>Working with promise</h3>
-
-<p>You can also queue work using a parameterless function that returns a promise, queffee will run it and wait for promise to resolve.</p>
-
-<pre><code>  doSomethingAsync = -&gt;
-    ...
-    promise
-
-  q = new queffee.Q
-  q.enQ(doSomethingAsync)
-  #or
-  job = new queffee.Job(doSomethingAsync, priority: 0, timeout: 2000)
-  q.enqueue(job)
-</code></pre>
 
 <h3>Working with synchronous functions</h3>
 
