@@ -38,7 +38,10 @@ You can also create enQ work or create job using a synchronized parameterless fu
     q.enQ(doSomething)
     new queffee.Job( doSomething, priority: 0, timeout: 2000)
 
-    
+You can also create enQ work or create job using a parameterless function that returns a promise, queffee will run it and wait for promise to resolve.
+
+
+
 The doSomethingHigher will be performed first, and then doSomething. Notice that the second parameter of enQ is the priority, it can be a function or a value.
 If your works priority is dynamic using the priority function, you can call q.reorder() to re-prioritize you queue whenever you deem appropriate.
 
