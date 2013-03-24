@@ -1,0 +1,12 @@
+{
+  "name": "queffee",
+  "version": "0.1.0",
+  "dependencies": {},
+  "devDependencies": {
+    "coffee-script": ">=1.5.0",
+    "uglify-js": ">=1.3.0"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  }
+}

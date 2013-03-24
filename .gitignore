@@ -1,6 +1,6 @@
 production/src/js
 test/src/js
 .idea
-node_modules/uglify-js/tmp
+node_modules
 *.swp
 output
