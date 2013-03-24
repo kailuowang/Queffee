@@ -1,7 +1,8 @@
 fs     = require 'fs'
 {exec} = require 'child_process'
 util   = require 'util'
-uglify = require './node_modules/uglify-js'
+uglify = require 'uglify-js'
+coffeePath = "node_modules/.bin/coffee"
 
 srcCoffeeDir     = 'main'
 testSrcCoffeeDir     = 'test'
@@ -15,7 +16,7 @@ prodTargetCoffeeFile = "#{srcCoffeeDir}/#{prodTargetFileName}.coffee"
 prodTargetJsFile     = "#{prodTargetJsDir}/#{prodTargetFileName}.js"
 prodTargetJsMinFile  = "#{prodTargetJsDir}/#{prodTargetFileName}.min.js"
 
-prodCoffeeOpts = "--bare --output #{prodTargetJsDir} --compile #{prodTargetCoffeeFile}"
+prodCoffeeOpts = "--output #{prodTargetJsDir} --compile #{prodTargetCoffeeFile}"
 testCoffeeOpts = "--output #{testTargetJsDir}"
 devCoffeeOpts = "--output #{devTargetJsDir}"
 
@@ -51,7 +52,7 @@ task 'build', 'Build a single JavaScript file from prod files', ->
                    , (err) ->
             handleError(err) if err
             
-            exec "coffee #{prodCoffeeOpts}", (err, stdout, stderr) ->
+            exec "#{coffeePath} #{prodCoffeeOpts}", (err, stdout, stderr) ->
                 handleError(err) if err
                 message = "Compiled #{prodTargetJsFile}"
                 util.log message
@@ -77,7 +78,6 @@ task 'build:test', 'Build individual test specs', ->
 task 'uglify', 'Minify and obfuscate', ->
     jsp = uglify.parser
     pro = uglify.uglify
-
     fs.readFile prodTargetJsFile, 'utf8', (err, fileContents) ->
         ast = jsp.parse fileContents  # parse code and get the initial AST
         ast = pro.ast_mangle ast # get a new AST with mangled names
@@ -93,7 +93,7 @@ task 'uglify', 'Minify and obfuscate', ->
     
 coffee = (options = "", file) ->
     util.log "Compiling #{file}"
-    exec "coffee #{options} --compile #{file}", (err, stdout, stderr) -> 
+    exec "#{coffeePath} #{options} --compile #{file}", (err, stdout, stderr) ->
         handleError(err) if err
         displayNotification "Compiled #{file}"
 

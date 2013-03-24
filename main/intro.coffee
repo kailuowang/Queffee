@@ -2,7 +2,7 @@
 queffee
 - A js dynamic priority work queue
 
-version: 1.0RC1
+version: 1.0.0
 
 Copyright (c) 2011 Kailuo Wang
 
@@ -28,5 +28,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 ###
+queffee = null
+if exports?
+  queffee = exports
+else
+  queffee = this.queffee = {}
 
-this.queffee = {}
