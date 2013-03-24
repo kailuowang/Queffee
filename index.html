@@ -187,32 +187,9 @@ Here is the usage, let's still take the preloading pictures as the example, exce
     ).start()
 </code></pre>
 
-<h3>Real Life Performance</h3>
+<h3>Performance</h3>
 
-<p>The core data structure of queffee is an array based binary heap as the queue. queffee has been tested as part of a real web application on machines with low process power such as the original Chromebook and Android tablets. The application ran smoothly with thousands of work tasks and reordering of the whole queue a couple of times every second.  </p>
-
-<h3>To do TDD</h3>
-
-<p>Based on the change to module management in <a href="http://blog.nodejs.org/2011/03/23/npm-1-0-global-vs-local-installation/" title="npm 1.0: Global vs Local installation &amp;laquo; node blog"><code>npm</code> v1.0+</a>, the following modules are now local to this project:</p>
-
-<ul>
-<li><a href="https://github.com/jashkenas/coffee-script">coffee-script</a></li>
-<li><a href="https://github.com/mishoo/UglifyJS">uglify-js</a></li>
-<li>
-<a href="https://github.com/visionmedia/node-growl">growl</a>, which requires <a href="http://growl.info/extras.php#growlnotify" title="Growl - Extras">growlnotify</a> to be available on your <code>PATH</code>
-</li>
-</ul><p>You shouldn't have to install them with <code>npm</code>.  If you're not running OS X, or don't have Growl available, you obviously won't see any pretty notifications.  But it should be trivial to replace that function with your OS specific variant if you'd like to.
-From project root:</p>
-
-<pre><code>$  cake watch:development
-</code></pre>
-
-<p>and open SpecRunner.html in browser</p>
-
-<h3>To build js and min js</h3>
-
-<pre><code>$  cake build
-</code></pre>
+<p>The core data structure of queffee is an array based binary heap as the queue. Thus both enqueue and dequeue are O(log(n)), reorder is O(n) </p>
 
 <h3>Acknowledgment</h3>
 
