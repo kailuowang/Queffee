@@ -31,7 +31,7 @@
         <div class="inner">
           <a href="https://github.com/kailuowang/Queffee/tarball/master" class="download-button tar"><span>Download</span></a>
           <a href="https://github.com/kailuowang/Queffee/zipball/master" class="download-button zip"><span>Download</span></a>
-          <a href="https://github.com/kailuowang/Queffee" class="code">fork Queffee on GitHub</a>
+          <a href="https://github.com/kailuowang/Queffee" class="code">View Queffee on GitHub</a>
         </div>
         <span class="blc"></span><span class="trc"></span>
         </div>
@@ -126,6 +126,21 @@ Back to the picture slide show as the example. With enough preloaded pictures, i
 
 <p>That's it. The picture.update() methods is offline safe now. The Updater class uses queffee to run the ajax requests one by one. If disconnection causes one ajax request to fail, it will automatically retry every 3 minutes until it succeeds and continue with the following one. The way it detects the disconnection is a bit naive here but you got the idea. 
 There are two not so obvious things here: 1) the worker will not proceed to the next job until the current job finishes and calls callback, so if the ajax call in the current job fails, the worker will stay with the current job 2) the worker.retry() function re-run current job again which if succeeds, will start moving things again. </p>
+
+<h3>Working with promise</h3>
+
+<p>You can also queue work using a parameterless function that returns a promise, queffee will run it and wait for promise to resolve.</p>
+
+<pre><code>  doSomethingAsync = -&gt;
+    ...
+    promise
+
+  q = new queffee.Q
+  q.enQ(doSomethingAsync)
+  #or
+  job = new queffee.Job(doSomethingAsync, priority: 0, timeout: 2000)
+  q.enqueue(job)
+</code></pre>
 
 <h3>Working with synchronous functions</h3>
 
@@ -233,7 +248,9 @@ OTHER DEALINGS IN THE SOFTWARE.</p>
     </div>
     <footer>
       <div class="owner">
-      <p><a href="https://github.com/kailuowang" class="avatar"><img src="https://secure.gravatar.com/avatar/c573cf31007f29236e1641e492bee036?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-140.png" width="48" height="48"/></a> <a href="https://github.com/kailuowang">kailuowang</a> maintains <a href="https://github.com/kailuowang/Queffee">Queffee</a></p>
+      <p><a href="https://github.com/kailuowang" class="avatar"><img src="https://secure.gravatar.com/avatar/c573cf31007f29236e1641e492bee036?s=30&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png" width="48" height="48"/></a> <a href="https://github.com/kailuowang">kailuowang</a> maintains <a href="https://github.com/kailuowang/Queffee">Queffee</a></p>
+
+
       </div>
       <div class="creds">
         <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="http://twitter.com/jonrohan/">Jon Rohan</a></small>
