@@ -122,12 +122,11 @@ Back to the picture slide show as the example. With enough preloaded pictures, i
     post: (url, data) =&gt; this._addJob('post', url, data)
 
     _addJob: (method, url, data) =&gt;
-      @_q.enQ (callback) =&gt;
+      @_q.enQ =&gt;
         $.ajax(
                 url: url
                 data: data
                 type: type
-                success: callback
                 error: =&gt; setTimeout(@_worker.retry, 180000)
               )
 </code></pre>
